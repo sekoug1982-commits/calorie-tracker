@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { food_name, calories, meal_type, serving_size, date } = body;
+  const { food_name, calories, protein, carbs, fat, meal_type, serving_size, date } = body;
 
   if (!food_name || !calories || !meal_type || !serving_size || !date) {
     return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
@@ -50,6 +50,9 @@ export async function POST(request: NextRequest) {
     .values({
       food_name,
       calories: Number(calories),
+      protein: Number(protein) || 0,
+      carbs: Number(carbs) || 0,
+      fat: Number(fat) || 0,
       meal_type,
       serving_size,
       date,

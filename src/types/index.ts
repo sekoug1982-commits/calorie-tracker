@@ -4,6 +4,9 @@ export interface FoodEntry {
   id: number;
   food_name: string;
   calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
   meal_type: MealType;
   serving_size: string;
   date: string;
@@ -13,6 +16,9 @@ export interface FoodEntry {
 export interface FoodPreset {
   name: string;
   calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
   serving_size: string;
 }
 
@@ -24,6 +30,9 @@ export interface DailyTotal {
 export interface AIFoodAnalysis {
   food_name: string;
   calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
   meal_type: MealType;
   serving_size: string;
   date: string;

@@ -15,3 +15,11 @@ export function formatDateShort(dateStr: string): string {
 export function formatDateLabel(dateStr: string): string {
   return format(new Date(dateStr + 'T00:00:00'), 'MMM d');
 }
+
+export function formatDateFull(dateStr: string): string {
+  return format(new Date(dateStr + 'T00:00:00'), 'EEEE, MMMM d');
+}
+
+export function formatDateCompact(dateStr: string): string {
+  return format(new Date(dateStr + 'T00:00:00'), 'MMM d, yyyy');
+}

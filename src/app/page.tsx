@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FoodEntry, FoodPreset, MealType, DailyTotal } from '@/types';
-import { todayISO } from '@/lib/utils';
+import { todayISO, formatDateFull, formatDateCompact } from '@/lib/utils';
 import DailySummary from '@/components/daily-summary';
 import FoodPresets from '@/components/food-presets';
 import FoodForm from '@/components/food-form';
@@ -18,6 +18,8 @@ export default function Home() {
   const [mealFilter, setMealFilter] = useState('All');
   const [prefill, setPrefill] = useState<FoodPreset | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const isToday = selectedDate === todayISO();
 
   const fetchEntries = useCallback(async () => {
     const res = await fetch(`/api/entries?date=${selectedDate}`);
@@ -56,9 +58,18 @@ export default function Home() {
     Promise.all([fetchEntries(), fetchWeeklyData()]).finally(() => setLoading(false));
   }, [fetchEntries, fetchWeeklyData]);
 
+  function navigateDay(offset: number) {
+    const d = new Date(selectedDate + 'T00:00:00');
+    d.setDate(d.getDate() + offset);
+    setSelectedDate(d.toISOString().split('T')[0]);
+  }
+
   async function handleAddEntry(entry: {
     food_name: string;
     calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
     meal_type: MealType;
     serving_size: string;
     date: string;
@@ -82,40 +93,150 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen py-8 px-4">
-      <div className="max-w-2xl mx-auto space-y-5">
-        <header className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Calorie Tracker</h1>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-          />
-        </header>
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Calorie Tracker</h1>
+              <p className="text-xs text-slate-400 mt-0.5">Track your daily nutrition</p>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => navigateDay(-1)}
+                className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                aria-label="Previous day"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    const input = document.getElementById('date-picker') as HTMLInputElement;
+                    input?.showPicker();
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    isToday
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : 'bg-slate-100 text-slate-700'
+                  }`}
+                >
+                  {isToday ? 'Today' : formatDateCompact(selectedDate)}
+                </button>
+                <input
+                  id="date-picker"
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  tabIndex={-1}
+                />
+              </div>
+              <button
+                onClick={() => navigateDay(1)}
+                className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                aria-label="Next day"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+              {!isToday && (
+                <button
+                  onClick={() => setSelectedDate(todayISO())}
+                  className="ml-1 px-2.5 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                >
+                  Today
+                </button>
+              )}
+            </div>
+          </div>
+          {!isToday && (
+            <p className="text-xs text-slate-400 text-right mt-1">{formatDateFull(selectedDate)}</p>
+          )}
+        </div>
+      </header>
 
+      {/* Main Content */}
+      <main className="max-w-3xl mx-auto px-4 py-6 space-y-5">
         {loading ? (
-          <div className="text-center py-12 text-gray-400">Loading...</div>
+          <LoadingSkeleton />
         ) : (
           <>
-            <DailySummary entries={entries} calorieGoal={CALORIE_GOAL} />
-            <FoodPresets onSelect={setPrefill} />
-            <FoodForm
-              selectedDate={selectedDate}
-              prefill={prefill}
-              onSubmit={handleAddEntry}
-              onClearPrefill={() => setPrefill(null)}
-            />
-            <WeeklyChart data={weeklyData} calorieGoal={CALORIE_GOAL} selectedDate={selectedDate} />
-            <FoodLog
-              entries={entries}
-              mealFilter={mealFilter}
-              onMealFilterChange={setMealFilter}
-              onDelete={handleDelete}
-            />
+            <div className="animate-fade-in">
+              <DailySummary entries={entries} calorieGoal={CALORIE_GOAL} />
+            </div>
+            <div className="animate-fade-in stagger-1">
+              <FoodPresets onSelect={setPrefill} />
+            </div>
+            <div className="animate-fade-in stagger-2">
+              <FoodForm
+                selectedDate={selectedDate}
+                prefill={prefill}
+                onSubmit={handleAddEntry}
+                onClearPrefill={() => setPrefill(null)}
+              />
+            </div>
+            <div className="animate-fade-in stagger-3">
+              <WeeklyChart data={weeklyData} calorieGoal={CALORIE_GOAL} selectedDate={selectedDate} />
+            </div>
+            <div className="animate-fade-in stagger-4">
+              <FoodLog
+                entries={entries}
+                mealFilter={mealFilter}
+                onMealFilterChange={setMealFilter}
+                onDelete={handleDelete}
+              />
+            </div>
           </>
         )}
+      </main>
+    </div>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="animate-pulse flex flex-col sm:flex-row gap-6 items-center">
+          <div className="w-36 h-36 rounded-full bg-slate-100" />
+          <div className="flex-1 space-y-4 w-full">
+            <div className="h-4 bg-slate-100 rounded-full w-3/4" />
+            <div className="h-3 bg-slate-100 rounded-full w-1/2" />
+            <div className="h-3 bg-slate-100 rounded-full w-2/3" />
+            <div className="grid grid-cols-4 gap-2 pt-2">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="h-14 bg-slate-100 rounded-xl" />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-    </main>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="animate-pulse space-y-3">
+          <div className="h-5 bg-slate-100 rounded-full w-28" />
+          <div className="flex gap-2 flex-wrap">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="h-8 bg-slate-100 rounded-full w-20" />
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="animate-pulse space-y-3">
+          <div className="h-5 bg-slate-100 rounded-full w-24" />
+          <div className="h-10 bg-slate-100 rounded-xl w-full" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-10 bg-slate-100 rounded-xl" />
+            <div className="h-10 bg-slate-100 rounded-xl" />
+          </div>
+          <div className="h-10 bg-slate-100 rounded-xl w-full" />
+        </div>
+      </div>
+    </div>
   );
 }

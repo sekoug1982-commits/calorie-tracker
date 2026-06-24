@@ -1,1 +1,66 @@
 @import "tailwindcss";
+
+@theme {
+  --color-protein: #3b82f6;
+  --color-carbs: #f59e0b;
+  --color-fat: #f43f5e;
+  --color-meal-breakfast: #f59e0b;
+  --color-meal-lunch: #10b981;
+  --color-meal-dinner: #3b82f6;
+  --color-meal-snack: #8b5cf6;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes progress-fill {
+  from { stroke-dashoffset: 326.73; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out both;
+}
+
+.animate-progress {
+  animation: progress-fill 1s ease-out both;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

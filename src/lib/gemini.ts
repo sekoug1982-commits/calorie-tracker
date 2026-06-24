@@ -18,9 +18,10 @@ Analyze the following food description and extract structured data.
 
 Rules:
 - Return ONLY valid JSON, no markdown, no code fences, no explanation.
-- Use exactly these field names: food_name, calories, meal_type, serving_size, date
+- Use exactly these field names: food_name, calories, protein, carbs, fat, meal_type, serving_size, date
 - meal_type must be exactly one of: "Breakfast", "Lunch", "Dinner", "Snack"
 - calories must be a positive integer (your best estimate for the described portion)
+- protein, carbs, fat must be positive integers representing grams
 - serving_size should be a human-readable quantity like "1 cup", "100g", "1 medium", "2 slices"
 - food_name should be a concise, common name for the food
 - If the description mentions a date, use it in YYYY-MM-DD format
@@ -35,9 +36,10 @@ Look at this food image and identify what food is shown. Extract structured data
 
 Rules:
 - Return ONLY valid JSON, no markdown, no code fences, no explanation.
-- Use exactly these field names: food_name, calories, meal_type, serving_size, date
+- Use exactly these field names: food_name, calories, protein, carbs, fat, meal_type, serving_size, date
 - meal_type must be exactly one of: "Breakfast", "Lunch", "Dinner", "Snack"
 - calories must be a positive integer (your best estimate based on the visible portion size)
+- protein, carbs, fat must be positive integers representing grams
 - serving_size should describe the visible portion like "1 plate", "1 bowl", "1 cup", "1 piece"
 - food_name should be a concise, common name for the food you see
 - Use today's date: {todayDate}
@@ -71,6 +73,10 @@ export function parseAIResponse(rawText: string, fallbackDate: string): AIFoodAn
     : null;
   if (!calories) throw new Error('AI response missing valid calories');
 
+  const protein = typeof obj.protein === 'number' ? Math.max(0, Math.round(obj.protein)) : 0;
+  const carbs = typeof obj.carbs === 'number' ? Math.max(0, Math.round(obj.carbs)) : 0;
+  const fat = typeof obj.fat === 'number' ? Math.max(0, Math.round(obj.fat)) : 0;
+
   const meal_type = VALID_MEAL_TYPES.includes(obj.meal_type as MealType)
     ? (obj.meal_type as MealType)
     : 'Snack';
@@ -83,5 +89,5 @@ export function parseAIResponse(rawText: string, fallbackDate: string): AIFoodAn
     ? obj.date
     : fallbackDate;
 
-  return { food_name, calories, meal_type, serving_size, date };
+  return { food_name, calories, protein, carbs, fat, meal_type, serving_size, date };
 }
