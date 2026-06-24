@@ -33,6 +33,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | ORM       | Drizzle ORM                       |
 | Charts    | Recharts                          |
 | Dates     | date-fns                          |
+| AI        | Google Gemini (gemini-2.5-flash-lite) via @google/generative-ai |
 
 ## Folder Structure
 
@@ -43,10 +44,14 @@ src/
 │   ├── page.tsx                Main dashboard (client component)
 │   ├── globals.css             Tailwind directives
 │   └── api/
-│       └── entries/
-│           ├── route.ts        GET + POST endpoints
-│           └── [id]/
-│               └── route.ts    DELETE endpoint
+│       ├── entries/
+│       │   ├── route.ts        GET + POST endpoints
+│       │   └── [id]/
+│       │       └── route.ts    DELETE endpoint
+│       ├── analyze-food-text/
+│       │   └── route.ts        AI text-based food analysis
+│       └── analyze-food-photo/
+│           └── route.ts        AI photo-based food analysis
 ├── components/
 │   ├── daily-summary.tsx       Calorie total, progress bar, meal breakdown
 │   ├── food-entry-card.tsx     Single entry row with delete button
@@ -59,6 +64,7 @@ src/
 │   ├── schema.ts               Drizzle schema (food_entries table)
 │   └── seed.ts                 22 food presets with calorie data
 ├── lib/
+│   ├── gemini.ts               Gemini AI client, prompts, response parser
 │   └── utils.ts                Date formatting helpers
 └── types/
     └── index.ts                TypeScript interfaces
@@ -82,11 +88,27 @@ The database file is created automatically on first run. It's gitignored.
 
 ## API Routes
 
-| Method | Path               | Description              |
-|--------|--------------------|--------------------------|
-| GET    | /api/entries       | List entries (filter by date, mealType, range=week) |
-| POST   | /api/entries       | Create a new entry       |
-| DELETE | /api/entries/[id]  | Delete an entry by ID    |
+| Method | Path                  | Description              |
+|--------|-----------------------|--------------------------|
+| GET    | /api/entries          | List entries (filter by date, mealType, range=week) |
+| POST   | /api/entries          | Create a new entry       |
+| DELETE | /api/entries/[id]     | Delete an entry by ID    |
+| POST   | /api/analyze-food-text  | AI-analyze a text description → structured food data |
+| POST   | /api/analyze-food-photo | AI-analyze a food photo → structured food data |
+
+## AI Food Analysis
+
+Two API routes use Gemini (`gemini-2.5-flash-lite`) to analyze food from text or photos. Both return structured data matching the `POST /api/entries` payload shape — the frontend can display results for user review before saving.
+
+**Text analysis** (`POST /api/analyze-food-text`):
+- Body: `{ "description": "I had oatmeal with blueberries for breakfast" }`
+- Returns: `{ food_name, calories, meal_type, serving_size, date }`
+
+**Photo analysis** (`POST /api/analyze-food-photo`):
+- Body: multipart form data with `image` field (JPEG, PNG, WebP, or HEIC, max 4MB)
+- Returns: same shape as text analysis
+
+Requires `GEMINI_API_KEY` in `.env.local` (gitignored). Returns 503 if the key is missing.
 
 ## Calorie Goal
 
@@ -94,6 +116,7 @@ Default is 2,000 kcal/day. To change it, edit the `CALORIE_GOAL` constant in `sr
 
 ## What's Coming Next
 
+- Frontend UI for AI text and photo food analysis (routes are ready, needs UI)
 - Editable calorie goal with persistence
 - Edit existing entries (not just delete)
 - Search/filter food presets

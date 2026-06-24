@@ -20,3 +20,11 @@ export interface DailyTotal {
   date: string;
   total_calories: number;
 }
+
+export interface AIFoodAnalysis {
+  food_name: string;
+  calories: number;
+  meal_type: MealType;
+  serving_size: string;
+  date: string;
+}
