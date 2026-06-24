@@ -4,7 +4,8 @@ A single-page calorie tracking web app. No accounts, no login — just open it a
 
 ## What It Does
 
-- Log meals with food name, calories, meal type, serving size, and date
+- Log meals three ways: manual entry, AI text description, or food photo upload
+- AI-powered: describe what you ate in plain English or snap a photo — Gemini identifies the food and pre-fills the form for review before saving
 - Pick from 22 common food presets to quickly pre-fill the form
 - View a daily dashboard with total calories, a progress bar toward a 2,000 kcal goal, and a breakdown by meal type (Breakfast / Lunch / Dinner / Snack)
 - See a weekly bar chart showing total calories per day for the past 7 days
@@ -55,7 +56,7 @@ src/
 ├── components/
 │   ├── daily-summary.tsx       Calorie total, progress bar, meal breakdown
 │   ├── food-entry-card.tsx     Single entry row with delete button
-│   ├── food-form.tsx           Meal logging form
+│   ├── food-form.tsx           Meal logging form (Manual / AI Text / Photo tabs)
 │   ├── food-log.tsx            Scrollable entry list with meal filter
 │   ├── food-presets.tsx        Quick-pick food grid
 │   └── weekly-chart.tsx        7-day bar chart
@@ -110,13 +111,22 @@ Two API routes use Gemini (`gemini-2.5-flash-lite`) to analyze food from text or
 
 Requires `GEMINI_API_KEY` in `.env.local` (gitignored). Returns 503 if the key is missing.
 
+### Frontend Integration
+
+The "Log a Meal" form has three tabs:
+
+1. **Manual** — traditional form with food name, calories, meal type, serving size
+2. **Describe** — textarea for natural language input (e.g., "I had a burger and fries for lunch"); hits `/api/analyze-food-text` and pre-fills the form
+3. **Photo** — file upload with image preview; hits `/api/analyze-food-photo` and pre-fills the form
+
+After AI analysis, all fields are editable before saving. A loading spinner shows during AI requests, and errors display as a friendly banner (e.g., "Couldn't identify the food — try describing it instead").
+
 ## Calorie Goal
 
 Default is 2,000 kcal/day. To change it, edit the `CALORIE_GOAL` constant in `src/app/page.tsx`.
 
 ## What's Coming Next
 
-- Frontend UI for AI text and photo food analysis (routes are ready, needs UI)
 - Editable calorie goal with persistence
 - Edit existing entries (not just delete)
 - Search/filter food presets
