@@ -1,0 +1,26 @@
+import { FoodPreset } from '@/types';
+
+export const foodPresets: FoodPreset[] = [
+  { name: 'Apple', calories: 95, serving_size: '1 medium' },
+  { name: 'Banana', calories: 105, serving_size: '1 medium' },
+  { name: 'Chicken Breast', calories: 165, serving_size: '100g' },
+  { name: 'Rice', calories: 206, serving_size: '1 cup cooked' },
+  { name: 'Eggs', calories: 78, serving_size: '1 large' },
+  { name: 'Coffee', calories: 2, serving_size: '1 cup black' },
+  { name: 'Pasta', calories: 220, serving_size: '1 cup cooked' },
+  { name: 'Salmon', calories: 208, serving_size: '100g' },
+  { name: 'Bread', calories: 79, serving_size: '1 slice' },
+  { name: 'Greek Yogurt', calories: 100, serving_size: '170g' },
+  { name: 'Oatmeal', calories: 154, serving_size: '1 cup cooked' },
+  { name: 'Avocado', calories: 240, serving_size: '1 whole' },
+  { name: 'Sweet Potato', calories: 103, serving_size: '1 medium' },
+  { name: 'Broccoli', calories: 55, serving_size: '1 cup' },
+  { name: 'Almonds', calories: 164, serving_size: '28g' },
+  { name: 'Milk', calories: 149, serving_size: '1 cup whole' },
+  { name: 'Cheese', calories: 113, serving_size: '28g cheddar' },
+  { name: 'Steak', calories: 271, serving_size: '100g' },
+  { name: 'Orange', calories: 62, serving_size: '1 medium' },
+  { name: 'Peanut Butter', calories: 188, serving_size: '2 tbsp' },
+  { name: 'Protein Shake', calories: 120, serving_size: '1 scoop' },
+  { name: 'Salad', calories: 20, serving_size: '1 cup mixed greens' },
+];

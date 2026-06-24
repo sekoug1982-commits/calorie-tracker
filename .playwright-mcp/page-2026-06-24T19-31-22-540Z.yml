@@ -1,0 +1,113 @@
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - heading "Calorie Tracker" [level=1] [ref=e5]
+        - textbox [ref=e6]: 2026-06-24
+      - generic [ref=e9]:
+        - heading "Daily Summary" [level=2] [ref=e10]
+        - generic [ref=e11]:
+          - generic [ref=e12]: "165"
+          - generic [ref=e13]: / 2,000 kcal
+        - paragraph [ref=e15]: 1,835 kcal remaining
+        - generic [ref=e16]:
+          - generic [ref=e17]:
+            - generic [ref=e18]: Breakfast
+            - generic [ref=e19]: "0"
+          - generic [ref=e20]:
+            - generic [ref=e21]: Lunch
+            - generic [ref=e22]: "165"
+          - generic [ref=e23]:
+            - generic [ref=e24]: Dinner
+            - generic [ref=e25]: "0"
+          - generic [ref=e26]:
+            - generic [ref=e27]: Snack
+            - generic [ref=e28]: "0"
+      - generic [ref=e29]:
+        - heading "Quick Add" [level=2] [ref=e30]
+        - generic [ref=e31]:
+          - button "Apple95" [active] [ref=e32]
+          - button "Banana105" [ref=e33]
+          - button "Chicken Breast165" [ref=e34]
+          - button "Rice206" [ref=e35]
+          - button "Eggs78" [ref=e36]
+          - button "Coffee2" [ref=e37]
+          - button "Pasta220" [ref=e38]
+          - button "Salmon208" [ref=e39]
+          - button "Bread79" [ref=e40]
+          - button "Greek Yogurt100" [ref=e41]
+          - button "Oatmeal154" [ref=e42]
+          - button "Avocado240" [ref=e43]
+          - button "Sweet Potato103" [ref=e44]
+          - button "Broccoli55" [ref=e45]
+          - button "Almonds164" [ref=e46]
+          - button "Milk149" [ref=e47]
+          - button "Cheese113" [ref=e48]
+          - button "Steak271" [ref=e49]
+          - button "Orange62" [ref=e50]
+          - button "Peanut Butter188" [ref=e51]
+          - button "Protein Shake120" [ref=e52]
+          - button "Salad20" [ref=e53]
+      - generic [ref=e54]:
+        - heading "Log a Meal" [level=2] [ref=e55]
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]: Food Name
+            - textbox "e.g., Chicken Breast" [ref=e59]: Apple
+          - generic [ref=e60]:
+            - generic [ref=e61]: Calories
+            - spinbutton [ref=e62]: "95"
+          - generic [ref=e63]:
+            - generic [ref=e64]: Meal Type
+            - combobox [ref=e65]:
+              - option "Breakfast"
+              - option "Lunch"
+              - option "Dinner"
+              - option "Snack" [selected]
+          - generic [ref=e66]:
+            - generic [ref=e67]: Serving Size
+            - textbox "e.g., 100g" [ref=e68]: 1 medium
+        - button "Add Entry" [ref=e69]
+      - generic [ref=e70]:
+        - heading "Weekly Summary" [level=2] [ref=e71]
+        - application [ref=e91]:
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - generic [ref=e102]: Thu
+              - generic [ref=e104]: Fri
+              - generic [ref=e106]: Sat
+              - generic [ref=e108]: Sun
+              - generic [ref=e110]: Mon
+              - generic [ref=e112]: Tue
+              - generic [ref=e114]: Wed
+            - generic [ref=e115]:
+              - generic [ref=e117]: "0"
+              - generic [ref=e119]: "45"
+              - generic [ref=e121]: "90"
+              - generic [ref=e123]: "135"
+              - generic [ref=e125]: "180"
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - heading "Food Log" [level=2] [ref=e75]
+          - combobox [ref=e76]:
+            - option "All Meals" [selected]
+            - option "Breakfast"
+            - option "Lunch"
+            - option "Dinner"
+            - option "Snack"
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - generic [ref=e128]:
+              - generic [ref=e129]: Chicken Breast
+              - generic [ref=e130]: 165 kcal
+              - generic [ref=e131]: Lunch
+            - generic [ref=e132]:
+              - generic [ref=e133]: 100g
+              - generic [ref=e134]: ·
+              - generic [ref=e135]: 12:30 PM
+          - button "Delete Chicken Breast" [ref=e136]:
+            - img [ref=e137]
+  - button "Open Next.js Dev Tools" [ref=e84] [cursor=pointer]:
+    - img [ref=e85]
+  - alert [ref=e8]
+  - generic [ref=e140]: "0"
