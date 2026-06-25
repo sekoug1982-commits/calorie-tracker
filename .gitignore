@@ -27,7 +27,5 @@ next-env.d.ts
 
 # database
 /data/
-*.db
-*.db-journal
-*.db-wal
+/drizzle/
 .playwright-mcp/

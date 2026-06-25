@@ -13,12 +13,29 @@ A single-page calorie and macro tracking web app. No accounts, no login — just
 - Filter the food log by meal type; entries are grouped by Breakfast/Lunch/Dinner/Snack
 - Navigate between dates with prev/next arrows or the date picker
 - Delete any entry with one click
-- All data persists in a local SQLite database
+- All data persists in a Neon PostgreSQL database
 
 ## How to Run
 
 ```bash
 npm install
+```
+
+Set up the database (one-time):
+
+1. Create a free Neon database at [neon.tech](https://neon.tech)
+2. Copy the connection string and add it to `.env.local`:
+   ```
+   DATABASE_URL=postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+   ```
+3. Push the schema to Neon:
+   ```bash
+   npm run db:push
+   ```
+
+Then start the dev server:
+
+```bash
 npm run dev
 ```
 
@@ -32,7 +49,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | Language  | TypeScript                                   |
 | Styling   | Tailwind CSS 4                               |
 | Font      | Inter (via next/font/google)                 |
-| Database  | SQLite via better-sqlite3                    |
+| Database  | Neon PostgreSQL (@neondatabase/serverless)   |
 | ORM       | Drizzle ORM                                  |
 | Charts    | Recharts                                     |
 | Dates     | date-fns                                     |
@@ -60,7 +77,7 @@ src/
 │   ├── food-presets.tsx        Expandable quick-pick food grid
 │   └── weekly-chart.tsx        7-day bar chart with goal line
 ├── db/
-│   ├── index.ts                DB connection + auto-migration
+│   ├── index.ts                DB connection (Neon PostgreSQL)
 │   ├── schema.ts               Drizzle schema (with macros)
 │   └── seed.ts                 22 food presets with macro data
 ├── lib/
@@ -72,11 +89,11 @@ src/
 
 ## Database
 
-Single table `food_entries` stored in `data/tracker.db`:
+Single table `food_entries` hosted on Neon PostgreSQL:
 
 | Column       | Type    | Description                          |
 |-------------|---------|--------------------------------------|
-| id          | INTEGER | Auto-increment primary key           |
+| id          | SERIAL  | Auto-increment primary key           |
 | food_name   | TEXT    | Name of the food                     |
 | calories    | INTEGER | Calorie count                        |
 | protein     | INTEGER | Protein in grams                     |
@@ -87,7 +104,7 @@ Single table `food_entries` stored in `data/tracker.db`:
 | date        | TEXT    | ISO date (YYYY-MM-DD)               |
 | created_at  | TEXT    | ISO timestamp                        |
 
-The database file is auto-created on first run and gitignored. Existing databases are auto-migrated to add macro columns.
+Schema is managed via Drizzle Kit. Run `npm run db:push` to sync schema changes to the database.
 
 ## API Routes
 
@@ -104,6 +121,13 @@ The database file is auto-created on first run and gitignored. Existing database
 Both text and photo analysis routes use Gemini to return structured data including macros (protein, carbs, fat). The frontend displays results for user review before saving.
 
 Requires `GEMINI_API_KEY` in `.env.local`. Returns 503 if missing.
+
+## Environment Variables
+
+| Variable       | Required | Description                          |
+|---------------|----------|--------------------------------------|
+| DATABASE_URL  | Yes      | Neon PostgreSQL connection string    |
+| GEMINI_API_KEY| No       | Google Gemini API key for AI features|
 
 ## Calorie Goal
 

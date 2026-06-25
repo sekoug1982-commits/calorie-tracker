@@ -1,7 +1,7 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
 
-export const foodEntries = sqliteTable('food_entries', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const foodEntries = pgTable('food_entries', {
+  id: serial('id').primaryKey(),
   food_name: text('food_name').notNull(),
   calories: integer('calories').notNull(),
   protein: integer('protein').notNull().default(0),
