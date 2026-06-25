@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiModel, PHOTO_ANALYSIS_PROMPT, parseAIResponse } from '@/lib/gemini';
+import { analyzePhoto, getOpenAIClient } from '@/lib/openai';
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
@@ -36,31 +36,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const arrayBuffer = await file.arrayBuffer();
-  const base64Data = Buffer.from(arrayBuffer).toString('base64');
-
-  let model;
   try {
-    model = getGeminiModel();
+    getOpenAIClient();
   } catch {
     return NextResponse.json({ error: 'AI service not configured' }, { status: 503 });
   }
 
+  const arrayBuffer = await file.arrayBuffer();
+  const base64Data = Buffer.from(arrayBuffer).toString('base64');
   const todayDate = new Date().toISOString().split('T')[0];
-  const prompt = PHOTO_ANALYSIS_PROMPT.replace('{todayDate}', todayDate);
 
   try {
-    const result = await model.generateContent([
-      {
-        inlineData: {
-          mimeType: file.type,
-          data: base64Data,
-        },
-      },
-      prompt,
-    ]);
-    const rawText = result.response.text();
-    const analysis = parseAIResponse(rawText, todayDate);
+    const analysis = await analyzePhoto(base64Data, file.type, todayDate);
     return NextResponse.json(analysis);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';

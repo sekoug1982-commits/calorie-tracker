@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiModel, TEXT_ANALYSIS_PROMPT, parseAIResponse } from '@/lib/gemini';
+import { analyzeText, getOpenAIClient } from '@/lib/openai';
 
 export async function POST(request: NextRequest) {
   let body: { description?: string };
@@ -23,22 +23,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let model;
   try {
-    model = getGeminiModel();
+    getOpenAIClient();
   } catch {
     return NextResponse.json({ error: 'AI service not configured' }, { status: 503 });
   }
 
   const todayDate = new Date().toISOString().split('T')[0];
-  const prompt = TEXT_ANALYSIS_PROMPT
-    .replace('{todayDate}', todayDate)
-    .replace('{description}', description.trim());
 
   try {
-    const result = await model.generateContent(prompt);
-    const rawText = result.response.text();
-    const analysis = parseAIResponse(rawText, todayDate);
+    const analysis = await analyzeText(description.trim(), todayDate);
     return NextResponse.json(analysis);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';

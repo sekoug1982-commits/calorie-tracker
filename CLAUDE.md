@@ -53,7 +53,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | ORM       | Drizzle ORM                                  |
 | Charts    | Recharts                                     |
 | Dates     | date-fns                                     |
-| AI        | Google Gemini (gemini-2.5-flash-lite)        |
+| AI        | OpenAI GPT-4o                                |
 
 ## Folder Structure
 
@@ -81,7 +81,7 @@ src/
 │   ├── schema.ts               Drizzle schema (with macros)
 │   └── seed.ts                 22 food presets with macro data
 ├── lib/
-│   ├── gemini.ts               Gemini client, prompts, parser
+│   ├── openai.ts               OpenAI client, prompts, parser
 │   └── utils.ts                Date formatting helpers
 └── types/
     └── index.ts                TypeScript interfaces
@@ -118,16 +118,16 @@ Schema is managed via Drizzle Kit. Run `npm run db:push` to sync schema changes 
 
 ## AI Food Analysis
 
-Both text and photo analysis routes use Gemini to return structured data including macros (protein, carbs, fat). The frontend displays results for user review before saving.
+Both text and photo analysis routes use OpenAI GPT-4o to return structured data including macros (protein, carbs, fat). The frontend displays results for user review before saving.
 
-Requires `GEMINI_API_KEY` in `.env.local`. Returns 503 if missing.
+Requires `OPENAI_API_KEY` in `.env.local`. Returns 503 if missing.
 
 ## Environment Variables
 
 | Variable       | Required | Description                          |
 |---------------|----------|--------------------------------------|
 | DATABASE_URL  | Yes      | Neon PostgreSQL connection string    |
-| GEMINI_API_KEY| No       | Google Gemini API key for AI features|
+| OPENAI_API_KEY| No       | OpenAI API key for AI features       |
 
 ## Calorie Goal
 

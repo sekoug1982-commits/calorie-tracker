@@ -1,20 +1,17 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import { AIFoodAnalysis, MealType } from '@/types';
 
 const VALID_MEAL_TYPES: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
-export function getGeminiModel() {
-  const apiKey = process.env.GEMINI_API_KEY;
+export function getOpenAIClient() {
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    throw new Error('GEMINI_API_KEY environment variable is not set');
+    throw new Error('OPENAI_API_KEY environment variable is not set');
   }
-  const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
+  return new OpenAI({ apiKey });
 }
 
-export const TEXT_ANALYSIS_PROMPT = `You are a nutrition analysis assistant for a calorie tracking app.
-
-Analyze the following food description and extract structured data.
+const SYSTEM_PROMPT = `You are a nutrition analysis assistant for a calorie tracking app.
 
 Rules:
 - Return ONLY valid JSON, no markdown, no code fences, no explanation.
@@ -23,30 +20,63 @@ Rules:
 - calories must be a positive integer (your best estimate for the described portion)
 - protein, carbs, fat must be positive integers representing grams
 - serving_size should be a human-readable quantity like "1 cup", "100g", "1 medium", "2 slices"
-- food_name should be a concise, common name for the food
+- food_name should be a concise, common name for the food`;
+
+export function buildTextPrompt(description: string, todayDate: string): string {
+  return `Analyze the following food description and extract structured data.
+
 - If the description mentions a date, use it in YYYY-MM-DD format
-- If no date is mentioned, use: {todayDate}
+- If no date is mentioned, use: ${todayDate}
 - If meal type can be inferred from context (e.g., "breakfast cereal", "midnight snack"), use it; otherwise default to "Snack"
 
-Food description: {description}`;
+Food description: ${description}`;
+}
 
-export const PHOTO_ANALYSIS_PROMPT = `You are a nutrition analysis assistant for a calorie tracking app.
+export function buildPhotoPrompt(todayDate: string): string {
+  return `Look at this food image and identify what food is shown. Extract structured data.
 
-Look at this food image and identify what food is shown. Extract structured data.
-
-Rules:
-- Return ONLY valid JSON, no markdown, no code fences, no explanation.
-- Use exactly these field names: food_name, calories, protein, carbs, fat, meal_type, serving_size, date
-- meal_type must be exactly one of: "Breakfast", "Lunch", "Dinner", "Snack"
-- calories must be a positive integer (your best estimate based on the visible portion size)
-- protein, carbs, fat must be positive integers representing grams
 - serving_size should describe the visible portion like "1 plate", "1 bowl", "1 cup", "1 piece"
-- food_name should be a concise, common name for the food you see
-- Use today's date: {todayDate}
-- If the food suggests a specific meal type (e.g., pancakes suggest Breakfast, a full plate of rice and meat suggests Lunch or Dinner), infer it; otherwise default to "Snack"
-- If multiple food items are visible, name the primary/largest item as food_name and estimate total combined calories
+- Use today's date: ${todayDate}
+- If the food suggests a specific meal type (e.g., pancakes suggest Breakfast), infer it; otherwise default to "Snack"
+- If multiple food items are visible, name the primary/largest item as food_name and estimate total combined calories`;
+}
 
-Analyze the image now.`;
+export async function analyzeText(description: string, todayDate: string): Promise<AIFoodAnalysis> {
+  const client = getOpenAIClient();
+  const response = await client.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: buildTextPrompt(description, todayDate) },
+    ],
+    temperature: 0.3,
+  });
+  const rawText = response.choices[0]?.message?.content ?? '';
+  return parseAIResponse(rawText, todayDate);
+}
+
+export async function analyzePhoto(base64Data: string, mimeType: string, todayDate: string): Promise<AIFoodAnalysis> {
+  const client = getOpenAIClient();
+  const response = await client.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: { url: `data:${mimeType};base64,${base64Data}` },
+          },
+          { type: 'text', text: buildPhotoPrompt(todayDate) },
+        ],
+      },
+    ],
+    temperature: 0.3,
+  });
+  const rawText = response.choices[0]?.message?.content ?? '';
+  return parseAIResponse(rawText, todayDate);
+}
 
 export function parseAIResponse(rawText: string, fallbackDate: string): AIFoodAnalysis {
   let cleaned = rawText.trim();
